@@ -32,6 +32,7 @@ int main(void) {
 void loop() {
   // put your main code here, to run repeatedly:
   watchdog();
+  task1();
 }
 
 void watchdog() {
@@ -41,10 +42,10 @@ void watchdog() {
   delay(1000);
 }
 
-/*
-void Task1() {
-digitalWrite(ledPin1, HIGH)
-  
+void task1() {
+  button1State = digitalRead(button1);
+}
+
+void task2() {
   
 }
-*/
