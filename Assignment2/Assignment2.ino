@@ -6,6 +6,7 @@
 #define ledPin2 21
 #define button1 22
 #define button2 23
+#define slot 10000
 
 void setup() {
   // put your setup code here, to run once:
@@ -31,21 +32,21 @@ int main(void) {
 //using loop() as this function uses for(;;)
 void loop() {
   // put your main code here, to run repeatedly:
-  watchdog();
   task1();
+  task2();
 }
 
-void watchdog() {
+void task1() {
   digitalWrite(ledPin2, HIGH);
   delay(5000);
   digitalWrite(ledPin2, LOW);
   delay(1000);
 }
 
-void task1() {
+void task2() {
   button1State = digitalRead(button1);
 }
 
-void task2() {
+void task3() {
   
 }
