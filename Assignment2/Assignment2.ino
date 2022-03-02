@@ -70,15 +70,18 @@ void loop() {
 
 void loop() {
   //is it alright to use ticker not in loop()?
+  //what does it mean by measure frequency in task 3 if it gives you the range already?
+  //for task 4 how do you measure the execution times with the spare digitial output?
+  //if you have 2 tasks of the same frequency do you put them in the same if statement?
+  //have i done my if statement for task 4 correctly?
 }
 
 //cyclic executive function
 void cycleF() {
   counter++;
-  
   task1(); // every cycle
   //Serial.println("1");
-  
+  /*
   if ((counter % 200) == 0){
     task2(); // every 200ms (5Hz)
     //Serial.println("2");
@@ -87,16 +90,21 @@ void cycleF() {
   if ((counter % 1000) == 0) {
     task3(); // every 1000ms (1Hz)
   }
-
+  */
+  if ((counter % 41) == 0) {
+    task4();
+    //delayMicroseconds(1670);
+  }
+  /*
   for(i = 0; i < 10; i++) {
     task6();
   }
-  /*
+  
   if((counter % 5000) == 0) {
     task9();
   }
   */
-  //Serial.println();
+  //Serial.println("end");
 }
 
 void wait_signal(){
@@ -130,13 +138,19 @@ void task3() {
 
 void task4() {
   analog_in = analogRead(ANALOG_PIN_4);
+  /*
+  Serial.println("test");
+  digitalWrite(ledPin2, HIGH);
+  delayMicroseconds(100);
+  digitalWrite(ledPin2, LOW);
+  */
 }
 
 void task5() {
   
 }
 
-//do nothing tasks
+//do nothing tasks set to run 10 times per ms rather than 1000 times every 100 ms
 void task6() {
   __asm__ __volatile__ ("nop");
   //Serial.println("test");
@@ -154,7 +168,7 @@ void task8() {
   
 }
 
-//log data every 5s
+//log data every 5s in CSV format
 void task9() {
   Serial.print(button1State);
   Serial.print(",");
