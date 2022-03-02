@@ -7,7 +7,7 @@
 #define ledPin2 21
 #define button1 22
 #define button2 23
-#define ANALOG_PIN_4 4
+#define AN_PIN_4 4
 #define slot 10000
 #define t_signal 1
 #define NOS_TASKS 4
@@ -72,7 +72,7 @@ void loop() {
   //is it alright to use ticker not in loop()?
   //what does it mean by measure frequency in task 3 if it gives you the range already?
   //for task 4 how do you measure the execution times with the spare digitial output?
-  //if you have 2 tasks of the same frequency do you put them in the same if statement?
+  //if you have 2 tasks of the same frequency do you put them in the same if statement? (tasks 4/5 & 7/8) OR can you put them in the same task function?
   //have i done my if statement for task 4 correctly?
 }
 
@@ -81,7 +81,7 @@ void cycleF() {
   counter++;
   task1(); // every cycle
   //Serial.println("1");
-  /*
+  
   if ((counter % 200) == 0){
     task2(); // every 200ms (5Hz)
     //Serial.println("2");
@@ -90,12 +90,12 @@ void cycleF() {
   if ((counter % 1000) == 0) {
     task3(); // every 1000ms (1Hz)
   }
-  */
+  
   if ((counter % 41) == 0) {
     task4();
-    //delayMicroseconds(1670);
+    delayMicroseconds(667);
   }
-  /*
+  
   for(i = 0; i < 10; i++) {
     task6();
   }
@@ -103,7 +103,7 @@ void cycleF() {
   if((counter % 5000) == 0) {
     task9();
   }
-  */
+  
   //Serial.println("end");
 }
 
@@ -137,7 +137,7 @@ void task3() {
 }
 
 void task4() {
-  analog_in = analogRead(ANALOG_PIN_4);
+  analog_in = analogRead(AN_PIN_4);
   /*
   Serial.println("test");
   digitalWrite(ledPin2, HIGH);
@@ -161,7 +161,7 @@ void task6() {
 }
 
 void task7() {
-  
+  if (average_analogue_in > half
 }
 
 void task8() {
