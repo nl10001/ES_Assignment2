@@ -1,5 +1,7 @@
+#include <TickTwo.h>
+#include <Ticker.h>
 #include<stdio.h>
-#include<Ticker.h>
+
 
 #define sigB 50 //
 // defining the corresponding pins to the ESP32 board 
@@ -11,6 +13,7 @@
 #define slot 10000
 #define t_signal 1
 #define NOS_TASKS 4
+#define MAX_VOLTAGE 4095
 
 // initialising the button state variables to low (default)
 int button1State = 0;
@@ -21,7 +24,7 @@ int counter = 0;
 int analog_in = 0;
 int wave_freq = 0;
 int i = 0;
-
+void cycleF();
 Ticker Cycle;
 
 void setup() {
@@ -72,18 +75,22 @@ void loop() {
   //is it alright to use ticker not in loop()?
   //what does it mean by measure frequency in task 3 if it gives you the range already?
   //for task 4 how do you measure the execution times with the spare digitial output?
-  //if you have 2 tasks of the same frequency do you put them in the same if statement? (tasks 4/5 & 7/8) OR can you put them in the same task function?
+  //(tasks 4/5 & 7/8)can you put them in the same task function?
   //have i done my if statement for task 4 correctly?
 }
 
 //cyclic executive function
 void cycleF() {
   counter++;
+  //digitalWrite(ledPin2, HIGH);
   task1(); // every cycle
+  //digitalWrite(ledPin2, LOW);
   //Serial.println("1");
   
   if ((counter % 200) == 0){
+    //digitalWrite(ledPin2, HIGH);
     task2(); // every 200ms (5Hz)
+    //digitalWrite(ledPin2, LOW);
     //Serial.println("2");
   }
   
@@ -92,14 +99,17 @@ void cycleF() {
   }
   
   if ((counter % 41) == 0) {
+    digitalWrite(ledPin2, HIGH);
     task4();
+    digitalWrite(ledPin2, LOW);
     delayMicroseconds(667);
+    
   }
-  
+  digitalWrite(ledPin2, HIGH);
   for(i = 0; i < 10; i++) {
     task6();
   }
-  
+  digitalWrite(ledPin2, LOW);
   if((counter % 5000) == 0) {
     task9();
   }
@@ -161,7 +171,7 @@ void task6() {
 }
 
 void task7() {
-  if (average_analogue_in > half
+  //if (average_analogue_in > (MAX_VOLTAGE/2))
 }
 
 void task8() {
