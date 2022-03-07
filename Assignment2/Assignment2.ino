@@ -3,19 +3,18 @@
 #include <math.h>
 
 
-#define sigB 50 //
+#define SIG_B 50 //
 // defining the corresponding pins to the ESP32 board 
-#define ledPin1 15
-#define ledPin2 21
-#define button1 22
-#define button2 23
+#define LEDPIN1 15
+#define LEDPIN2 21
+#define BUTTON1 22
+#define BUTTON2 23
 #define PIN_4 4
 #define AN_PIN_0 0
-#define slot 10000
-#define t_signal 1
+#define CYCLE_LENGTH 1
 #define NOS_TASKS 4
 #define MAX_VOLTAGE 4095
-#define POW(i) pow(10,i)
+#define POW_BASE10(i) pow(10,i)
 
 // initialising the button state variables to low (default)
 int button1State = 0;
@@ -29,8 +28,8 @@ int average_an;
 int wave_freq = 0;
 int pinData = 0;
 int i = 0;
-int data4 = 0;
 int sum = 0;
+int task5_data = 0;
 int task7_data = 0;
 int task8_data = 0;
 int error_code = 0;
@@ -41,14 +40,14 @@ Ticker Cycle;
 
 void setup() {
   // put your setup code here, to run once:
-  pinMode(button1, INPUT);
-  pinMode(button2, INPUT);
+  pinMode(BUTTON1, INPUT);
+  pinMode(BUTTON2, INPUT);
   pinMode(AN_PIN_0, INPUT);
   pinMode(PIN_4, INPUT);
-  pinMode(ledPin1, OUTPUT);
-  pinMode(ledPin2, OUTPUT);
+  pinMode(LEDPIN1, OUTPUT);
+  pinMode(LEDPIN2, OUTPUT);
   Serial.begin(115200);
-  Cycle.attach_ms(1, cycleF);
+  Cycle.attach_ms(CYCLE_LENGTH, cycleF);
   delay(100);
 }
 
@@ -80,13 +79,13 @@ void cycleF() {
   
   if ((counter_main % 42) == 0) {
     //digitalWrite(ledPin2, HIGH);
-    data4 = task4();
+    task5_data = task4();
     //digitalWrite(ledPin2, LOW);
   }
   
   if ((counter_main % 42) == 21) {
     //digitalWrite(ledPin2, HIGH);
-    task7_data = task5(data4);
+    task7_data = task5(task5_data);
     //digitalWrite(ledPin2, LOW);
   }
 /*
@@ -116,21 +115,17 @@ void cycleF() {
   //Serial.println("end");
 }
 
-void wait_signal(){
-  delay(1);
-}
-
 //watchdog waveform
 void task1() {
-  digitalWrite(ledPin1, HIGH);
-  delayMicroseconds(50);
-  digitalWrite(ledPin1, LOW);
+  digitalWrite(LEDPIN1, HIGH);
+  delayMicroseconds(SIG_B);
+  digitalWrite(LEDPIN1, LOW);
   return;
 }
 
 //monitor digital input (0 = LOW, 1 = HIGH)
 void task2() {
-  button1State = digitalRead(button1);
+  button1State = digitalRead(BUTTON1);
   //Serial.println(button1State);
   //delay(150);
   //digitalWrite(ledPin2, HIGH);
@@ -142,7 +137,7 @@ void task2() {
 //Measure frequency of 3.3V square wave signal
 void task3() {
   pinData = pulseIn(PIN_4, LOW);
-  wave_freq = 1/(2*pinData*POW(-6));
+  wave_freq = 1/(2*pinData*POW_BASE10(-6));
   //Serial.println(wave_freq);
 }
 
@@ -152,21 +147,21 @@ int task4() {
   return analog_in;
 }
 
-int task5(int data4) {
+int task5(int data) {
   
   //Serial.println(counter_task4_5);
   switch(counter_task4_5) {
     case 0:
-      data_array[counter_task4_5] = data4;
+      data_array[counter_task4_5] = data;
       break;
     case 1:
-      data_array[counter_task4_5] = data4;
+      data_array[counter_task4_5] = data;
       break;
     case 2:
-      data_array[counter_task4_5] = data4;
+      data_array[counter_task4_5] = data;
       break;
     case 3:
-      data_array[counter_task4_5] = data4;
+      data_array[counter_task4_5] = data;
       break;
   }
   counter_task4_5++;
@@ -212,10 +207,10 @@ int task7(int data) {
 
 void task8(int data) {
   if(data == 1) {
-    digitalWrite(ledPin2, HIGH);
+    digitalWrite(LEDPIN2, HIGH);
   }
   else {
-    digitalWrite(ledPin2, LOW);
+    digitalWrite(LEDPIN2, LOW);
   }
   
 }
@@ -224,5 +219,7 @@ void task8(int data) {
 void task9() {
   Serial.print(button1State);
   Serial.print(",");
-  Serial.println(wave_freq);
+  Serial.print(wave_freq);
+  Serial.print(",");
+  Serial.println(task7_data);
 }
