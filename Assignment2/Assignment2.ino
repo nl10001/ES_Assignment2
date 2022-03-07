@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <math.h>
 
-
 #define SIG_B 50 //
 // defining the corresponding pins to the ESP32 board 
 #define LEDPIN1 15
@@ -19,21 +18,19 @@
 // initialising the button state variables to low (default)
 int button1State = 0;
 int button2State = 0;
-
-//int ticks = 0;
 int counter_main = 0;
 int counter_task4_5 = 0;
 int analog_in = 0;
+int average_an_data = 0;
 int average_an;
 int wave_freq = 0;
 int pinData = 0;
 int i = 0;
 int sum = 0;
-int task5_data = 0;
+int unfiltered_an_data = 0;
 int task7_data = 0;
 int task8_data = 0;
 int error_code = 0;
-
 int data_array[] = {0,0,0,0};
 
 Ticker Cycle;
@@ -61,16 +58,10 @@ void loop() {}
 //cyclic executive function
 void cycleF() {
   counter_main++;
-  //digitalWrite(ledPin2, HIGH);
-  task1(); // every cycle
-  //digitalWrite(ledPin2, LOW);
-  //Serial.println("1");
+  task1(); // every cycle  
   
   if ((counter_main % 200) == 0){
-    //digitalWrite(ledPin2, HIGH);
     task2(); // every 200ms (5Hz)
-    //digitalWrite(ledPin2, LOW);
-    //Serial.println("2");
   }
   
   if ((counter_main % 1000) == 0) {
@@ -78,30 +69,19 @@ void cycleF() {
   }
   
   if ((counter_main % 42) == 0) {
-    //digitalWrite(ledPin2, HIGH);
-    task5_data = task4();
-    //digitalWrite(ledPin2, LOW);
+    unfiltered_an_data = task4();
   }
   
   if ((counter_main % 42) == 21) {
-    //digitalWrite(ledPin2, HIGH);
-    task7_data = task5(task5_data);
-    //digitalWrite(ledPin2, LOW);
+    average_an_data = task5(unfiltered_an_data);
   }
-/*
-  if ((counter_main % 21) == 0) {
-    counter_task5_6++;
-    if ((counter_task % 2) == 0) {
-      
-    }
-  }
- */ 
+
   for(i = 0; i < 10; i++) {
     task6();
   }
 
   if((counter_main % 333) == 0) {
-    task8_data = task7(task7_data);  
+    task8_data = task7(average_an_data);  
   }
 
   if((counter_main % 333) == 167) {
@@ -109,10 +89,8 @@ void cycleF() {
   }
 
   if((counter_main % 5000) == 0) {
-    task9();
+    task9(button1State, wave_freq, average_an_data);
   }
-  
-  //Serial.println("end");
 }
 
 //watchdog waveform
@@ -126,11 +104,6 @@ void task1() {
 //monitor digital input (0 = LOW, 1 = HIGH)
 void task2() {
   button1State = digitalRead(BUTTON1);
-  //Serial.println(button1State);
-  //delay(150);
-  //digitalWrite(ledPin2, HIGH);
-  //delayMicroseconds(100);
-  //digitalWrite(ledPin2, LOW);
   return;
 }
 
@@ -148,8 +121,6 @@ int task4() {
 }
 
 int task5(int data) {
-  
-  //Serial.println(counter_task4_5);
   switch(counter_task4_5) {
     case 0:
       data_array[counter_task4_5] = data;
@@ -165,14 +136,7 @@ int task5(int data) {
       break;
   }
   counter_task4_5++;
-  /*
-  for(i = 0; i < 4; i++) {
-    Serial.print(data_array[i]);
-    Serial.print("\t");
-    
-  }
-  Serial.println();
-  */
+
   if(counter_task4_5 == 4) {
     counter_task4_5 = 0;
   }
@@ -181,18 +145,13 @@ int task5(int data) {
     sum += data_array[i];
   }
   average_an = sum/4;
-  Serial.println(average_an);
+  //Serial.println(average_an);
   return average_an;
 }
 
 //do nothing tasks set to run 10 times per ms rather than 1000 times every 100 ms
 void task6() {
-  __asm__ __volatile__ ("nop");
-  //Serial.println("test");
-  //digitalWrite(ledPin2, HIGH);
-  //delayMicroseconds(100);
-  //digitalWrite(ledPin2, LOW);
-  
+  __asm__ __volatile__ ("nop"); 
 }
 
 int task7(int data) {
@@ -216,10 +175,10 @@ void task8(int data) {
 }
 
 //log data every 5s in CSV format
-void task9() {
-  Serial.print(button1State);
+void task9(int data1, int data2, int data3) {
+  Serial.print(data1);
   Serial.print(",");
-  Serial.print(wave_freq);
+  Serial.print(data2);
   Serial.print(",");
-  Serial.println(task7_data);
+  Serial.println(data3);
 }
