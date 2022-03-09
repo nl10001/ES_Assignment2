@@ -39,7 +39,7 @@ int data_array[] = {0,0,0,0};
 Ticker Cycle;
 
 void setup() {
-  // put your setup code here, to run once including all i/o pins and serial monitor
+  //put your setup code here, to run once including all i/o pins and serial monitor
   pinMode(BUTTON1, INPUT);
   pinMode(BUTTON2, INPUT);
   pinMode(AN_PIN_0, INPUT);
@@ -52,13 +52,13 @@ void setup() {
   delay(100);
 }
 
-
 void loop() {}
 
 //cyclic executive function
 void cycleF() {
   //increment the main counter every time the function runs
   counter_main++;
+  
   //execute watchdog every cycle  
   task1();
 
@@ -124,8 +124,10 @@ void task2() {
 void task3() {
   //use pulseIn function to measure the period of the wave 
   pinData = pulseIn(PIN_4, LOW);
-  //calculate the frequency by using f = 1/T
+  
+  //calculate the frequency by using f = (1/T)*2
   wave_freq = 1/(2*pinData*POW_BASE10(-6));
+  
   //Serial.println(wave_freq);
 }
 
@@ -133,12 +135,13 @@ void task3() {
 int task4() {
   analog_in = analogRead(AN_PIN_0);
   //Serial.println(analog_in);
+  
   return analog_in;
 }
 
 //average the last 4 readings of task4()
 int task5(int data) {
-  //switch case to decide where in the array the data should be added by use of a new counter
+  //switch case to decide what position in the array the data should be added
   switch(counter_task4_5) {
     case 0:
       data_array[counter_task4_5] = data;
@@ -153,21 +156,27 @@ int task5(int data) {
       data_array[counter_task4_5] = data;
       break;
   }
+  
   //increment the new counter 
   counter_task4_5++;
+  
   //if the new counter reaches 4 then reset to start over which then updates the oldest element of the array (FILO)
   if(counter_task4_5 == 4) {
     counter_task4_5 = 0;
   }
-  //ensure sum is set to 0
+  
+  //sum is set to 0 to ensure no ambiguity
   sum = 0;
+  
   //iterate through the array and store the sum of all values in sum
   for(i = 0; i < 4; i++) {
     sum += data_array[i];
   }
+  
   //calculate the avergage value of the last 4 readings
   average_an = sum/4;
   //Serial.println(average_an);
+  
   //return the average analog value
   return average_an;
 }
@@ -187,6 +196,7 @@ int task7(int data) {
   else {
     error_code = 0;
   }
+  
   //return the state of the error_code
   return error_code;
 }
@@ -207,10 +217,12 @@ void task8(int data) {
 void task9(int data1, int data2, int data3) {
   //print the state of button 1
   Serial.print(data1);
-  Serial.print(",");
+  Serial.print(", ");
+  
   //print the frequency of the 3.3v square wave signal
-  Serial.print(data2 + ""); 
-  Serial.print(",");
+  Serial.print(data2); 
+  Serial.print(", ");
+  
   //print the filtered analog input
   Serial.println(data3);
 }
