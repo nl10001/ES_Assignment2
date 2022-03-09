@@ -75,7 +75,9 @@ void cycleF() {
   //execute task4() every 42ms (~24Hz rounded from 41.667)
   if ((counter_main % 42) == 0) {
     //store the returned integer from task 4 as the unfiltered analog data
+    //digitalWrite(LEDPIN1, HIGH);
     unfiltered_an_data = task4();
+    //digitalWrite(LEDPIN1, LOW);
   }
 
   //execute task5() every 42ms (~24Hz rounded from 41.667) but offset from task4() by 21ms
