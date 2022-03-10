@@ -8,9 +8,10 @@
 #define LEDPIN2 21
 #define BUTTON1 22
 #define BUTTON2 23
+#define TASK_EXE_PIN 17
 #define PIN_4 4
 #define AN_PIN_0 0
-#define CYCLE_LENGTH 1
+#define CYCLE_LENGTH 8
 #define NOS_TASKS 4
 #define MAX_RANGE 4095
 
@@ -46,6 +47,7 @@ void setup() {
   pinMode(PIN_4, INPUT);
   pinMode(LEDPIN1, OUTPUT);
   pinMode(LEDPIN2, OUTPUT);
+  pinMode(TASK_EXE_PIN, OUTPUT);
   Serial.begin(115200);
   //setup ticker to run the function cycleF at a period of CYCLE_LENGTH 
   Cycle.attach_ms(CYCLE_LENGTH, cycleF);
@@ -57,53 +59,47 @@ void loop() {}
 //cyclic executive function
 void cycleF() {
   //increment the main counter every time the function runs
-  counter_main++;
+  counter_main ++;
   
   //execute watchdog every cycle  
   task1();
 
   //execute task2() every 200ms (5Hz)
-  if ((counter_main % 200) == 0){
+  if ((counter_main % 25) == 0){
     task2();
   }
 
   //execute task3() every 1s (1Hz)
-  if ((counter_main % 1000) == 0) {
+  if ((counter_main % 125) == 0) {
     task3(); // every 1000ms (1Hz)
   }
 
-  //execute task4() every 42ms (~24Hz rounded from 41.667)
-  if ((counter_main % 42) == 0) {
+  //execute task4() and task5() every 42ms (~24Hz rounded from 41.667)
+  if ((counter_main % 5) == 0) {
     //store the returned integer from task 4 as the unfiltered analog data
-    //digitalWrite(LEDPIN1, HIGH);
+    digitalWrite(TASK_EXE_PIN, HIGH);
     unfiltered_an_data = task4();
-    //digitalWrite(LEDPIN1, LOW);
-  }
-
-  //execute task5() every 42ms (~24Hz rounded from 41.667) but offset from task4() by 21ms
-  if ((counter_main % 42) == 21) {
-    //store the returned integer from task5() as the average analog data
+    digitalWrite(TASK_EXE_PIN, LOW);
+    //run task5() with the data from task4()
     average_an_data = task5(unfiltered_an_data);
+    
   }
 
-  //execute task6() 10 times every 1ms (10Hz) instead of 1000 times every 100ms
-  for (i = 0; i < 10; i++) {
+  //execute task6() 80 times every 8ms (10Hz) instead of 1000 times every 100ms
+  for (i = 0; i < 80; i++) {
     task6();
   }
 
-  //execute task7() every 333ms (~3Hz rounded from 333.333)
-  if ((counter_main % 333) == 0) {
+  //execute task7() and task8() every 333ms (~3Hz rounded from 333.333)
+  if ((counter_main % 42) == 0) {
     //store the returned integer from task7() as the error code data
-    error_code_data = task7(average_an_data);  
+    error_code_data = task7(average_an_data);
+    //run task8() with the data from task7()
+    task8(error_code_data);  
   }
 
-  //execute task8() every 333ma (~3Hz rounded from 333.333) but offset by 167ms
-  if ((counter_main % 333) == 167) {
-    task8(error_code_data);
-  }
-  
   //execute task9() eveyr 5s (0.2Hz)
-  if ((counter_main % 5000) == 0) {
+  if ((counter_main % 625) == 0) {
     task9(button1State, wave_freq, average_an_data);
   }
 }
@@ -127,8 +123,6 @@ void task3() {
   
   //calculate the frequency by using f = (1/T)*2
   wave_freq = 1/(2*pinData*POW_BASE10(-6));
-  
-  //Serial.println(wave_freq);
 }
 
 //read the analog input connected to a signal generator
@@ -181,7 +175,7 @@ int task5(int data) {
   return average_an;
 }
 
-//do nothing tasks set to run 10 times per ms rather than 1000 times every 100 ms
+//do nothing tasks set to run 80 times per 8ms rather than 1000 times every 100 ms
 void task6() {
   __asm__ __volatile__ ("nop"); 
 }
